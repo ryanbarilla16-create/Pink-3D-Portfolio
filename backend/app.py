@@ -48,6 +48,85 @@ app.config["MYSQL_SSL_CA"] = "/etc/ssl/certs/ca-certificates.crt"
 
 mysql = MySQL(app)
 
+# ─── Auto-create tables on startup ────────────────────────────────────────────
+def init_db():
+    """Create all required tables if they don't exist."""
+    with app.app_context():
+        try:
+            conn = pymysql.connect(
+                host=app.config["MYSQL_HOST"],
+                port=int(os.getenv("MYSQL_PORT", 4000)),
+                user=app.config["MYSQL_USER"],
+                password=app.config["MYSQL_PASSWORD"],
+                database=app.config["MYSQL_DB"],
+                ssl={"ssl": True}
+            )
+            cur = conn.cursor()
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    email VARCHAR(255) NOT NULL,
+                    message TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS replies (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    message_id INT NOT NULL,
+                    body TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS projects (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    category VARCHAR(100) NOT NULL,
+                    description TEXT NOT NULL,
+                    image_url VARCHAR(255),
+                    tags VARCHAR(255),
+                    live_url VARCHAR(255),
+                    github_url VARCHAR(255),
+                    featured TINYINT(1) DEFAULT 0,
+                    sort_order INT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS certificates (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    image_url VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS skills (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL,
+                    category VARCHAR(100) NOT NULL,
+                    level INT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS otp_codes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    email VARCHAR(255) NOT NULL,
+                    code VARCHAR(10) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.commit()
+            cur.close()
+            conn.close()
+            print("✅ Database tables initialized successfully!")
+        except Exception as e:
+            print(f"⚠️ Database init warning: {e}")
+
+init_db()
+
 # ─── Mail Config ──────────────────────────────────────────────────────────────
 app.config["MAIL_SERVER"]         = "smtp.gmail.com"
 app.config["MAIL_PORT"]           = 587
