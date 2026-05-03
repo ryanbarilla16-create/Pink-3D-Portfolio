@@ -1,4 +1,9 @@
 flask
 flask-cors
+flask-mysqldb
+PyMySQL
+flask-mail
+flask-jwt-extended
 python-dotenv
+gunicorn
 psycopg2-binary

@@ -1,3 +1,5 @@
+import pymysql
+pymysql.install_as_MySQLdb()
 from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for, session, flash
 from flask_cors import CORS
 from flask_mysqldb import MySQL
