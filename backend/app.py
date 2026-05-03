@@ -118,6 +118,20 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS profile_info (
+                    field_key VARCHAR(100) PRIMARY KEY,
+                    field_value TEXT
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS activity_log (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    action VARCHAR(255) NOT NULL,
+                    details TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
             conn.commit()
             cur.close()
             conn.close()
