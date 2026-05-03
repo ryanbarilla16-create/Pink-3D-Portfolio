@@ -1,5 +1,14 @@
 import pymysql
 pymysql.install_as_MySQLdb()
+
+# Force SSL for all TiDB connections
+import MySQLdb
+_original_connect = MySQLdb.connect
+def _ssl_connect(*args, **kwargs):
+    kwargs['ssl'] = {'ssl': True} # This triggers SSL in PyMySQL
+    return _original_connect(*args, **kwargs)
+MySQLdb.connect = _ssl_connect
+
 from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for, session, flash
 from flask_cors import CORS
 from flask_mysqldb import MySQL
