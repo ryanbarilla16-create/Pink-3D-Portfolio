@@ -18,7 +18,7 @@ export default function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.json()).then(setProfile).catch(() => {});
+    fetch('https://pink-portfolio-backend.onrender.com/api/profile').then(r => r.json()).then(setProfile).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export default function Hero() {
                 Get in Touch
               </motion.button>
               <motion.a
-                href="/api/resume"
+                href="https://pink-portfolio-backend.onrender.com/api/resume"
                 download
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -219,7 +219,7 @@ export default function Hero() {
                 {/* Profile Image */}
                 <div className="w-full h-full rounded-full overflow-hidden bg-pink-100 border-4 border-white">
                   <img
-                    src="/api/profile-picture"
+                    src="https://pink-portfolio-backend.onrender.com/api/profile-picture"
                     alt="Ryan Bien"
                     className="w-full h-full object-cover"
                     onError={(e) => {

@@ -15,7 +15,7 @@ export default function Certificates() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/certificates')
+    fetch('https://pink-portfolio-backend.onrender.com/api/certificates')
       .then((r) => r.json())
       .then((data) => { setCertificates(data); setLoading(false); })
       .catch(() => setLoading(false));

@@ -34,7 +34,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/projects')
+    fetch('https://pink-portfolio-backend.onrender.com/api/projects')
       .then(r => r.json())
       .then(data => { setProjects(data); setLoading(false); })
       .catch(() => setLoading(false));

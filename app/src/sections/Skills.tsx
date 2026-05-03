@@ -38,7 +38,7 @@ export default function Skills() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/skills')
+    fetch('https://pink-portfolio-backend.onrender.com/api/skills')
       .then(r => r.json())
       .then(data => { setSkillGroups(data); setLoading(false); })
       .catch(() => setLoading(false));

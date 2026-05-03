@@ -24,7 +24,7 @@ export default function Contact() {
   const [profile, setProfile] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.json()).then(setProfile).catch(() => {});
+    fetch('https://pink-portfolio-backend.onrender.com/api/profile').then(r => r.json()).then(setProfile).catch(() => {});
   }, []);
 
   const contactInfo = [
@@ -50,7 +50,7 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://pink-portfolio-backend.onrender.com/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
