@@ -34,6 +34,9 @@ app.config["MYSQL_PASSWORD"] = os.getenv("MYSQL_PASSWORD", "")
 app.config["MYSQL_DB"]       = os.getenv("MYSQL_DB", "portfolio_db")
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
+# Enable SSL for TiDB Cloud
+app.config["MYSQL_SSL_CA"] = "/etc/ssl/certs/ca-certificates.crt"
+
 mysql = MySQL(app)
 
 # ─── Mail Config ──────────────────────────────────────────────────────────────
