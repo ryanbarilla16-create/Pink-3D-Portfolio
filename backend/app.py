@@ -104,12 +104,23 @@ def init_db():
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS skills (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
+                    skill_name VARCHAR(100) NOT NULL,
                     category VARCHAR(100) NOT NULL,
                     level INT DEFAULT 0,
+                    sort_order INT DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            
+            # Safely try to alter existing skills table just in case it was created with old schema
+            try:
+                cur.execute("ALTER TABLE skills CHANGE COLUMN name skill_name VARCHAR(100) NOT NULL")
+            except Exception:
+                pass
+            try:
+                cur.execute("ALTER TABLE skills ADD COLUMN sort_order INT DEFAULT 0")
+            except Exception:
+                pass
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS otp_codes (
                     id INT AUTO_INCREMENT PRIMARY KEY,
