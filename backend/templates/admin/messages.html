@@ -1,0 +1,369 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Messages</h1>
+    <p class="text-gray-500 mt-2 flex items-center gap-2">
+      <span id="msgCount" class="font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">{{ messages|length }}</span> 
+      <span class="text-sm">message{{ 's' if messages|length != 1 else '' }} received</span>
+      <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+      <span class="inline-flex items-center gap-1.5 text-xs text-emerald-500 font-semibold uppercase tracking-wider">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        Live Sync
+      </span>
+    </p>
+  </div>
+  
+  <div class="flex items-center gap-3">
+    <div class="relative group">
+      <input type="text" id="msgSearch" placeholder="Search messages..." 
+        class="w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/20 focus:border-brand-400 transition-all shadow-sm group-hover:shadow-md">
+      <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    <select id="msgFilter" class="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/20 focus:border-brand-400 transition-all shadow-sm cursor-pointer hover:bg-gray-50">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+    </select>
+  </div>
+</div>
+
+<div id="messagesContainer" class="space-y-4">
+  {% if messages %}
+    {% for msg in messages %}
+    <div class="message-card group bg-white/60 backdrop-blur-md rounded-3xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(236,72,153,0.1)] hover:-translate-y-1" data-id="{{ msg.id }}">
+
+      <!-- Card Header -->
+      <div class="p-6 pb-4 border-b border-pink-50/50">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-300 to-purple-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-200/50 transform group-hover:scale-105 transition-transform">
+                {{ msg.name[0].upper() }}
+              </div>
+              <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 text-lg group-hover:text-brand-600 transition-colors">{{ msg.name }}</h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <a href="mailto:{{ msg.email }}" class="text-sm font-medium text-brand-500/80 hover:text-brand-600 transition-colors flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  {{ msg.email }}
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="text-right mr-2 hidden sm:block">
+              <p class="text-xs font-semibold text-gray-400 uppercase tracking-tighter">{{ msg.created_at.strftime('%b %d, %Y') if msg.created_at else '' }}</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ msg.created_at.strftime('%I:%M %p') if msg.created_at else '' }}</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="openReply({{ msg.id }}, '{{ msg.name|replace("'", "\\'") }}', '{{ msg.email }}')"
+                 class="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-600 text-sm font-bold rounded-xl hover:bg-brand-500 hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                </svg>
+                Reply
+              </button>
+              <a href="/admin/messages/delete/{{ msg.id }}"
+                 onclick="return confirm('Delete this message?')"
+                 class="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-500 flex items-center justify-center text-red-400 hover:text-white transition-all duration-300 group/del shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Body / Conversation Thread -->
+      <div class="p-6 bg-white/40">
+        <div class="space-y-6">
+          <!-- Client Message -->
+          <div class="flex gap-4">
+            <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 text-xs font-bold flex-shrink-0 mt-1">
+              {{ msg.name[0].upper() }}
+            </div>
+            <div class="flex-1 space-y-1">
+              <div class="bg-white border border-pink-100 rounded-2xl rounded-tl-none px-5 py-3.5 shadow-sm inline-block max-w-[90%]">
+                <p class="text-sm text-gray-700 leading-relaxed font-medium">{{ msg.message }}</p>
+              </div>
+              <p class="text-[10px] text-gray-400 ml-1 font-medium">{{ msg.created_at.strftime('%I:%M %p') if msg.created_at else '' }}</p>
+            </div>
+          </div>
+
+          <!-- Admin Replies -->
+          <div id="replies-{{ msg.id }}" class="space-y-4">
+            {% if msg.replies %}
+              {% for reply in msg.replies %}
+              <div class="flex gap-4 justify-end">
+                <div class="flex-1 space-y-1 text-right">
+                  <div class="bg-gradient-to-br from-brand-500 to-purple-500 rounded-2xl rounded-tr-none px-5 py-3.5 shadow-lg shadow-brand-100/50 inline-block text-left max-w-[90%]">
+                    <p class="text-sm text-white leading-relaxed font-medium">{{ reply.body }}</p>
+                  </div>
+                  <p class="text-[10px] text-gray-400 mr-1 font-medium">
+                    You · {{ reply.created_at.strftime('%I:%M %p') if reply.created_at else '' }}
+                  </p>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1 shadow-md">
+                  R
+                </div>
+              </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="bg-white/60 backdrop-blur-md rounded-3xl border border-white/50 shadow-sm p-20 text-center">
+      <div class="relative w-24 h-24 mx-auto mb-8">
+        <div class="absolute inset-0 bg-brand-100 rounded-full animate-pulse"></div>
+        <div class="relative w-full h-full rounded-full bg-white flex items-center justify-center shadow-lg">
+          <svg class="w-12 h-12 text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800 mb-2">Inbox is empty</h3>
+      <p class="text-gray-500 max-w-xs mx-auto">When clients reach out through your portfolio, their messages will appear here in real-time.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md transition-all duration-300">
+  <div class="bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-lg border border-white overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+    <div class="relative p-8 pb-4">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-black text-gray-900">Send Reply</h3>
+          <p class="text-sm text-gray-500 mt-1">Replying to <span id="replyName" class="font-bold text-brand-600"></span></p>
+        </div>
+        <button onclick="closeReply()" class="w-10 h-10 rounded-2xl bg-gray-100/50 hover:bg-brand-50 flex items-center justify-center transition-all group">
+          <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Recipient Email</label>
+          <div class="px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm text-gray-600 font-medium flex items-center gap-2">
+            <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span id="replyEmailDisplay"></span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Subject</label>
+          <input type="text" id="replySubject" value="Re: Your message to Ryan Bien"
+            class="w-full px-5 py-3.5 rounded-2xl bg-white border border-gray-200 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all font-medium"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Your Message</label>
+          <textarea id="replyBody" rows="5" placeholder="Type your message here..."
+            class="w-full px-5 py-4 rounded-2xl bg-white border border-gray-200 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all resize-none font-medium"></textarea>
+        </div>
+
+        <div id="replyStatus" class="hidden px-5 py-3.5 rounded-2xl text-sm font-bold animate-fadeIn"></div>
+      </div>
+    </div>
+
+    <div class="p-8 pt-4 flex items-center justify-end gap-3">
+      <button onclick="closeReply()" class="px-6 py-3 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors">Discard</button>
+      <button onclick="sendReply()" id="sendBtn"
+        class="group relative flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-brand-500 to-purple-600 text-white text-sm font-black rounded-2xl shadow-xl shadow-brand-200 hover:shadow-brand-300 hover:scale-[1.02] active:scale-95 transition-all">
+        <span>Send Message</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentReplyEmail = '';
+  let currentMsgId = null;
+  let currentCount = {{ messages|length }};
+
+  function openReply(id, name, email) {
+    currentMsgId = id;
+    currentReplyEmail = email;
+    document.getElementById('replyName').textContent = name;
+    document.getElementById('replyEmailDisplay').textContent = email;
+    document.getElementById('replyBody').value = '';
+    document.getElementById('replyStatus').classList.add('hidden');
+    
+    const modal = document.getElementById('replyModal');
+    const content = document.getElementById('modalContent');
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Trigger animation
+    setTimeout(() => {
+      content.classList.remove('scale-95', 'opacity-0');
+      content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+    
+    setTimeout(() => document.getElementById('replyBody').focus(), 300);
+  }
+
+  function closeReply() {
+    const modal = document.getElementById('replyModal');
+    const content = document.getElementById('modalContent');
+    
+    content.classList.add('scale-95', 'opacity-0');
+    content.classList.remove('scale-100', 'opacity-100');
+    
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 300);
+  }
+
+  function sendReply() {
+    const subject = document.getElementById('replySubject').value.trim();
+    const body    = document.getElementById('replyBody').value.trim();
+    const btn     = document.getElementById('sendBtn');
+    const status  = document.getElementById('replyStatus');
+
+    if (!body) {
+      status.textContent = 'Please write a message.';
+      status.className = 'px-5 py-3.5 rounded-2xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 mb-4 block';
+      status.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg> Sending...`;
+
+    fetch('/admin/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: currentReplyEmail, subject, body, message_id: currentMsgId })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const repliesDiv = document.getElementById('replies-' + currentMsgId);
+        if (repliesDiv) {
+          const now = data.reply.created_at;
+          const bubble = `
+            <div class="flex gap-4 justify-end animate-fadeIn">
+              <div class="flex-1 space-y-1 text-right">
+                <div class="bg-gradient-to-br from-brand-500 to-purple-500 rounded-2xl rounded-tr-none px-5 py-3.5 shadow-lg shadow-brand-100/50 inline-block text-left max-w-[90%]">
+                  <p class="text-sm text-white leading-relaxed font-medium">${escHtml(body)}</p>
+                </div>
+                <p class="text-[10px] text-gray-400 mr-1 font-medium">You · ${now}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1 shadow-md">R</div>
+            </div>`;
+          repliesDiv.insertAdjacentHTML('beforeend', bubble);
+        }
+
+        if (data.email_error) {
+          status.textContent = 'Saved! (Email failed: ' + data.email_error.substring(0, 40) + '...)';
+          status.className = 'px-5 py-3.5 rounded-2xl text-sm font-bold bg-amber-50 text-amber-600 border border-amber-100 mb-4 block';
+          status.classList.remove('hidden');
+          setTimeout(() => closeReply(), 2500);
+        } else {
+          status.textContent = '✓ Reply sent successfully!';
+          status.className = 'px-5 py-3.5 rounded-2xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 mb-4 block';
+          status.classList.remove('hidden');
+          setTimeout(() => closeReply(), 1500);
+        }
+      } else {
+        status.textContent = data.error || 'Failed to send.';
+        status.className = 'px-5 py-3.5 rounded-2xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 mb-4 block';
+        status.classList.remove('hidden');
+      }
+    })
+    .catch(() => {
+      status.textContent = 'Network error. Please try again.';
+      status.className = 'px-5 py-3.5 rounded-2xl text-sm font-bold bg-red-50 text-red-600 border border-red-100 mb-4 block';
+      status.classList.remove('hidden');
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = originalContent;
+    });
+  }
+
+  // Search & Filter
+  const searchInput = document.getElementById('msgSearch');
+  const filterSelect = document.getElementById('msgFilter');
+  const container = document.getElementById('messagesContainer');
+
+  searchInput.addEventListener('input', filterMessages);
+  filterSelect.addEventListener('change', filterMessages);
+
+  function filterMessages() {
+    const term = searchInput.value.toLowerCase();
+    const cards = Array.from(document.querySelectorAll('.message-card'));
+    
+    cards.forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(term) ? '' : 'none';
+    });
+
+    if (filterSelect.value === 'oldest') {
+      cards.reverse().forEach(card => container.appendChild(card));
+    } else {
+      cards.forEach(card => container.appendChild(card));
+    }
+  }
+
+  document.getElementById('replyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReply();
+  });
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function poll() {
+    fetch('/api/messages/poll').then(r => r.json()).then(data => {
+      if (data.count !== currentCount) {
+        if (data.count > currentCount) {
+          // Play a subtle notification sound or show a toast if you want
+          location.reload(); 
+        }
+        currentCount = data.count;
+        document.getElementById('msgCount').textContent = data.count;
+      }
+    }).catch(() => {});
+  }
+  setInterval(poll, 5000);
+</script>
+
+<style>
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+  .animate-fadeIn { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .message-card { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  {% for msg in messages %}
+  .message-card:nth-child({{ loop.index }}) { animation-delay: {{ loop.index0 * 0.05 }}s; }
+  {% endfor %}
+</style>
+
+{% endblock %}

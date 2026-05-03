@@ -1,0 +1,218 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Header -->
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+  <p class="text-gray-500 mt-1">Welcome back, Ryan! Here's your portfolio analytics.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+  <div class="bg-white/80 backdrop-blur rounded-2xl p-5 border border-pink-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </div>
+      <span class="text-xs text-gray-400 bg-pink-50 px-2 py-0.5 rounded-full">Total</span>
+    </div>
+    <p class="text-3xl font-bold text-gray-800" id="dashMsgCount">{{ message_count }}</p>
+    <p class="text-xs text-gray-500 mt-1">Messages</p>
+  </div>
+
+  <div class="bg-white/80 backdrop-blur rounded-2xl p-5 border border-purple-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      </div>
+      <span class="text-xs text-gray-400 bg-purple-50 px-2 py-0.5 rounded-full">Uploaded</span>
+    </div>
+    <p class="text-3xl font-bold text-gray-800">{{ cert_count }}</p>
+    <p class="text-xs text-gray-500 mt-1">Certificates</p>
+  </div>
+
+  <div class="bg-white/80 backdrop-blur rounded-2xl p-5 border border-blue-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      </div>
+      <span class="text-xs text-gray-400 bg-blue-50 px-2 py-0.5 rounded-full">Added</span>
+    </div>
+    <p class="text-3xl font-bold text-gray-800">{{ proj_count }}</p>
+    <p class="text-xs text-gray-500 mt-1">Projects</p>
+  </div>
+
+  <div class="bg-white/80 backdrop-blur rounded-2xl p-5 border border-green-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <span class="text-xs text-gray-400 bg-green-50 px-2 py-0.5 rounded-full">Status</span>
+    </div>
+    <p class="text-2xl font-bold text-gray-800">Live</p>
+    <p class="text-xs text-gray-500 mt-1">Portfolio</p>
+  </div>
+
+</div>
+
+<!-- Charts Row 1 -->
+<div class="grid md:grid-cols-2 gap-6 mb-6">
+
+  <!-- Messages per Day -->
+  <div class="bg-white/80 backdrop-blur rounded-2xl border border-pink-100 shadow-sm p-6">
+    <h3 class="font-bold text-gray-800 mb-4">Messages — Last 7 Days</h3>
+    <div class="relative h-52">
+      <canvas id="dailyChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Messages by Hour -->
+  <div class="bg-white/80 backdrop-blur rounded-2xl border border-pink-100 shadow-sm p-6">
+    <h3 class="font-bold text-gray-800 mb-4">Messages by Hour</h3>
+    <div class="relative h-52">
+      <canvas id="hourlyChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- Charts Row 2 -->
+<div class="grid md:grid-cols-3 gap-6 mb-6">
+
+  <!-- Top Senders Pie -->
+  <div class="bg-white/80 backdrop-blur rounded-2xl border border-pink-100 shadow-sm p-6">
+    <h3 class="font-bold text-gray-800 mb-4">Top Senders</h3>
+    <div class="relative h-48">
+      <canvas id="senderChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Messages -->
+  <div class="bg-white/80 backdrop-blur rounded-2xl border border-pink-100 shadow-sm md:col-span-2">
+    <div class="flex items-center justify-between p-5 border-b border-pink-50">
+      <h3 class="font-bold text-gray-800">Recent Messages</h3>
+      <a href="/admin/messages" class="text-sm text-pink-500 hover:text-pink-600 font-medium">View all →</a>
+    </div>
+    {% if messages %}
+    <div class="divide-y divide-pink-50">
+      {% for msg in messages[:4] %}
+      <div class="flex items-start gap-3 p-4 hover:bg-pink-50/50 transition-colors">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-300 to-purple-300 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {{ msg.name[0].upper() }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <p class="font-semibold text-gray-800 text-sm truncate">{{ msg.name }}</p>
+            <span class="text-xs text-gray-400 flex-shrink-0">{{ msg.created_at.strftime('%b %d') if msg.created_at else '' }}</span>
+          </div>
+          <p class="text-xs text-gray-500 truncate">{{ msg.message }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="p-10 text-center text-gray-400 text-sm">No messages yet.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+  const pink   = '#f472b6';
+  const purple = '#a78bfa';
+  const blue   = '#60a5fa';
+  const green  = '#34d399';
+  const orange = '#fb923c';
+
+  const dailyLabels  = {{ daily_labels|safe }};
+  const dailyCounts  = {{ daily_counts|safe }};
+  const hourlyLabels = {{ hourly_labels|safe }};
+  const hourlyCounts = {{ hourly_counts|safe }};
+  const senderLabels = {{ sender_labels|safe }};
+  const senderCounts = {{ sender_counts|safe }};
+
+  // Messages per day — Bar chart
+  new Chart(document.getElementById('dailyChart'), {
+    type: 'bar',
+    data: {
+      labels: dailyLabels.length ? dailyLabels : ['No data'],
+      datasets: [{
+        label: 'Messages',
+        data: dailyCounts.length ? dailyCounts : [0],
+        backgroundColor: 'rgba(244,114,182,0.3)',
+        borderColor: pink,
+        borderWidth: 2,
+        borderRadius: 8,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Messages by hour — Line chart
+  new Chart(document.getElementById('hourlyChart'), {
+    type: 'line',
+    data: {
+      labels: hourlyLabels.length ? hourlyLabels : ['No data'],
+      datasets: [{
+        label: 'Messages',
+        data: hourlyCounts.length ? hourlyCounts : [0],
+        borderColor: purple,
+        backgroundColor: 'rgba(167,139,250,0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: purple,
+        pointRadius: 4,
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Top senders — Doughnut chart
+  new Chart(document.getElementById('senderChart'), {
+    type: 'doughnut',
+    data: {
+      labels: senderLabels.length ? senderLabels : ['No data'],
+      datasets: [{
+        data: senderCounts.length ? senderCounts : [1],
+        backgroundColor: [pink, purple, blue, green, orange],
+        borderWidth: 0,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } }
+      },
+      cutout: '65%',
+    }
+  });
+
+  // Live poll for message count
+  setInterval(() => {
+    fetch('/api/messages/poll').then(r => r.json()).then(data => {
+      const el = document.getElementById('dashMsgCount');
+      if (el) el.textContent = data.count;
+    }).catch(() => {});
+  }, 5000);
+</script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="mb-8 flex items-center gap-4">
+  <a href="/admin/projects" class="w-9 h-9 rounded-xl bg-pink-50 hover:bg-pink-100 flex items-center justify-center transition-colors">
+    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+  </a>
+  <div>
+    <h1 class="text-3xl font-bold text-gray-800">Edit Project</h1>
+    <p class="text-gray-500 mt-1">Update project details.</p>
+  </div>
+</div>
+
+<div class="max-w-2xl">
+  <div class="bg-white/80 backdrop-blur rounded-2xl border border-pink-100 shadow-sm p-8">
+    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-pink-500">*</span></label>
+        <input type="text" name="title" required value="{{ project.title }}"
+          class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"/>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-pink-500">*</span></label>
+        <select name="category" required class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white">
+          {% for cat in ['Web App', 'Dashboard', 'Mobile App', 'Backend', 'E-Commerce'] %}
+          <option value="{{ cat }}" {% if project.category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-pink-500">*</span></label>
+        <textarea name="description" required rows="3"
+          class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm resize-none">{{ project.description }}</textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Tags <span class="text-gray-400 text-xs">(comma separated)</span></label>
+        <input type="text" name="tags" value="{{ project.tags or '' }}"
+          class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"/>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Live Demo URL</label>
+          <input type="url" name="live_url" value="{{ project.live_url or '' }}"
+            class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
+          <input type="url" name="github_url" value="{{ project.github_url or '' }}"
+            class="w-full px-4 py-3 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Current Screenshot -->
+      {% if project.image_url %}
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Current Screenshot</label>
+        <img src="{{ project.image_url }}" alt="Current" class="h-32 rounded-xl object-cover border border-pink-100"/>
+      </div>
+      {% endif %}
+
+      <!-- New Screenshot -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Replace Screenshot <span class="text-gray-400 text-xs">(optional)</span></label>
+        <div class="border-2 border-dashed border-pink-200 rounded-xl p-4 text-center cursor-pointer hover:border-pink-400 hover:bg-pink-50/50 transition-all"
+             onclick="document.getElementById('newImg').click()">
+          <p class="text-sm text-gray-500">Click to upload new screenshot</p>
+          <p id="newImgName" class="text-xs text-pink-500 mt-1"></p>
+        </div>
+        <input type="file" name="image" id="newImg" accept="image/*" class="hidden"
+               onchange="document.getElementById('newImgName').textContent = this.files[0]?.name || ''"/>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input type="checkbox" name="featured" id="featured" class="w-4 h-4 accent-pink-500"
+               {% if project.featured %}checked{% endif %}/>
+        <label for="featured" class="text-sm font-medium text-gray-700">Mark as Featured</label>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+          class="flex-1 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+          Save Changes
+        </button>
+        <a href="/admin/projects"
+          class="px-6 py-3 bg-gray-100 text-gray-600 font-medium rounded-xl hover:bg-gray-200 transition-colors text-center">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

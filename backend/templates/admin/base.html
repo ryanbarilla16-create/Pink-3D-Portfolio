@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Ryan Bien Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:  '#fdf2f8',
+              100: '#fce7f3',
+              200: '#fbcfe8',
+              300: '#f9a8d4',
+              400: '#f472b6',
+              500: '#ec4899',
+              600: '#db2777',
+            }
+          },
+          boxShadow: {
+            'soft': '0 2px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
+            'card': '0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #f8f7ff; }
+    .sidebar-link { transition: all 0.2s ease; }
+    .sidebar-link:hover { background: rgba(244,114,182,0.08); }
+    .sidebar-link.active { background: linear-gradient(135deg, #f472b6, #a78bfa); color: white; box-shadow: 0 4px 15px rgba(244,114,182,0.35); }
+    .sidebar-link.active svg { color: white; }
+    .card { background: white; border-radius: 16px; border: 1px solid #f3f4f6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.1)} }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 4px; }
+    .dropdown-enter { animation: dropIn 0.15s ease; }
+    @keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+<div class="flex min-h-screen">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="w-60 bg-white border-r border-gray-100 flex flex-col fixed top-0 left-0 h-full z-30" style="box-shadow: 1px 0 20px rgba(0,0,0,0.04)">
+
+    <!-- Logo -->
+    <div class="px-5 py-5 border-b border-gray-50">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-base flex-shrink-0"
+             style="background: linear-gradient(135deg, #f472b6, #a78bfa)">R</div>
+        <div>
+          <p class="font-semibold text-gray-900 text-sm leading-none">Ryan Bien</p>
+          <p class="text-xs text-gray-400 mt-0.5">Portfolio Admin</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">Main</p>
+
+      <a href="/admin/dashboard" class="sidebar-link {% if request.path in ['/admin/dashboard','/admin'] %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+
+      <a href="/admin/messages" class="sidebar-link {% if request.path == '/admin/messages' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Messages
+        <span id="sidebarMsgBadge" class="ml-auto text-xs font-semibold px-1.5 py-0.5 rounded-full bg-brand-500 text-white {% if message_count is not defined or message_count == 0 %}hidden{% endif %}">
+          {{ message_count if message_count is defined else 0 }}
+        </span>
+      </a>
+
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-4 mb-2">Portfolio</p>
+
+      <a href="/admin/hero" class="sidebar-link {% if request.path == '/admin/hero' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        Hero Content
+      </a>
+
+      <a href="/admin/profile-info" class="sidebar-link {% if request.path == '/admin/profile-info' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Profile Info
+      </a>
+
+      <a href="/admin/profile" class="sidebar-link {% if request.path == '/admin/profile' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Profile Photo
+      </a>
+
+      <a href="/admin/projects" class="sidebar-link {% if request.path == '/admin/projects' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        Projects
+      </a>
+
+      <a href="/admin/skills" class="sidebar-link {% if request.path == '/admin/skills' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Skills
+      </a>
+
+      <a href="/admin/certificates" class="sidebar-link {% if request.path == '/admin/certificates' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        Certificates
+      </a>
+
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-4 mb-2">System</p>
+
+      <a href="/admin/activity" class="sidebar-link {% if request.path == '/admin/activity' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Activity Log
+      </a>
+
+      <a href="/" target="_blank" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        View Portfolio
+      </a>
+    </nav>
+
+    <!-- User info bottom -->
+    <div class="px-4 py-4 border-t border-gray-50">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+             style="background: linear-gradient(135deg, #f472b6, #a78bfa)">R</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-gray-800 truncate">Ryan Bien</p>
+          <p class="text-[10px] text-gray-400 truncate">ryanbarilla16@gmail.com</p>
+        </div>
+        <a href="/admin/logout" class="text-gray-400 hover:text-red-400 transition-colors" title="Logout">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <div class="flex-1 ml-60 flex flex-col min-h-screen">
+
+    <!-- Top Bar -->
+    <header class="sticky top-0 z-20 bg-white border-b border-gray-100 px-8 py-3.5 flex items-center justify-between" style="box-shadow: 0 1px 10px rgba(0,0,0,0.04)">
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-400">Admin</span>
+        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <span class="text-xs font-semibold text-gray-700">
+          {% if request.path in ['/admin/dashboard','/admin'] %}Dashboard
+          {% elif request.path == '/admin/messages' %}Messages
+          {% elif request.path == '/admin/profile' %}Profile Photo
+          {% elif request.path == '/admin/profile-info' %}Profile Info
+          {% elif request.path == '/admin/certificates' %}Certificates
+          {% elif request.path == '/admin/projects' %}Projects
+          {% elif request.path == '/admin/skills' %}Skills
+          {% elif request.path == '/admin/hero' %}Hero Content
+          {% elif request.path == '/admin/activity' %}Activity Log
+          {% else %}Admin Panel{% endif %}
+        </span>
+      </div>
+
+      <div class="flex items-center gap-3">
+
+        <!-- Notification Bell -->
+        <div class="relative" id="notifWrapper">
+          <button onclick="toggleNotif()" class="relative w-9 h-9 rounded-xl bg-gray-50 hover:bg-brand-50 flex items-center justify-center transition-colors border border-gray-100">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-brand-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold hidden">0</span>
+          </button>
+
+          <div id="notifDropdown" class="hidden dropdown-enter absolute right-0 top-11 w-72 bg-white rounded-2xl border border-gray-100 overflow-hidden z-50" style="box-shadow: 0 20px 60px rgba(0,0,0,0.12)">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+              <p class="font-semibold text-gray-800 text-sm">Notifications</p>
+              <a href="/admin/messages" class="text-xs text-brand-500 hover:text-brand-600 font-medium">View all</a>
+            </div>
+            <div id="notifList" class="max-h-64 overflow-y-auto">
+              <div class="px-4 py-8 text-center text-sm text-gray-400">No new notifications</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="relative" id="profileWrapper">
+          <button onclick="toggleProfile()" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                 style="background: linear-gradient(135deg, #f472b6, #a78bfa)">R</div>
+            <div class="text-left hidden sm:block">
+              <p class="text-xs font-semibold text-gray-800 leading-none">Ryan Bien</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">Administrator</p>
+            </div>
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div id="profileDropdown" class="hidden dropdown-enter absolute right-0 top-11 w-48 bg-white rounded-2xl border border-gray-100 overflow-hidden z-50" style="box-shadow: 0 20px 60px rgba(0,0,0,0.12)">
+            <div class="px-4 py-3 border-b border-gray-50">
+              <p class="font-semibold text-gray-800 text-xs">Ryan Bien N. Barilla</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">ryanbarilla16@gmail.com</p>
+            </div>
+            <div class="p-1.5">
+              <a href="/admin/profile" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-gray-600 hover:bg-gray-50 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Profile Photo
+              </a>
+              <a href="/admin/forgot-password" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-gray-600 hover:bg-gray-50 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                Change Password
+              </a>
+              <div class="border-t border-gray-50 mt-1 pt-1">
+                <a href="/admin/logout" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-red-500 hover:bg-red-50 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  Logout
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="px-8 pt-4">
+      {% with flashes = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in flashes %}
+        <div class="mb-3 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2
+          {% if category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-100
+          {% else %}bg-red-50 text-red-600 border border-red-100{% endif %}">
+          {% if category == 'success' %}
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% else %}
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% endif %}
+          {{ msg }}
+        </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
+
+    <!-- Page Content -->
+    <main class="flex-1 px-8 py-6 overflow-auto">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script>
+  function toggleNotif() {
+    document.getElementById('notifDropdown').classList.toggle('hidden');
+    document.getElementById('profileDropdown').classList.add('hidden');
+  }
+  function toggleProfile() {
+    document.getElementById('profileDropdown').classList.toggle('hidden');
+    document.getElementById('notifDropdown').classList.add('hidden');
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('notifWrapper').contains(e.target))
+      document.getElementById('notifDropdown').classList.add('hidden');
+    if (!document.getElementById('profileWrapper').contains(e.target))
+      document.getElementById('profileDropdown').classList.add('hidden');
+  });
+
+  let lastNotifCount = 0;
+
+  function pollNotifications() {
+    fetch('/api/messages/poll').then(r => r.json()).then(data => {
+      const count = data.count;
+      const badge = document.getElementById('notifBadge');
+      const sidebarBadge = document.getElementById('sidebarMsgBadge');
+
+      if (count > 0) {
+        badge.textContent = count > 9 ? '9+' : count;
+        badge.classList.remove('hidden');
+        if (sidebarBadge) { sidebarBadge.textContent = count; sidebarBadge.classList.remove('hidden'); }
+      } else {
+        badge.classList.add('hidden');
+        if (sidebarBadge) sidebarBadge.classList.add('hidden');
+      }
+
+      lastNotifCount = count;
+      const list = document.getElementById('notifList');
+      const msgs = data.messages || [];
+      if (msgs.length === 0) {
+        list.innerHTML = '<div class="px-4 py-8 text-center text-sm text-gray-400">No notifications</div>';
+      } else {
+        list.innerHTML = msgs.slice(0, 5).map(msg => `
+          <a href="/admin/messages" class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors block border-b border-gray-50 last:border-0">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5"
+                 style="background:linear-gradient(135deg,#f9a8d4,#c4b5fd)">${msg.name.charAt(0).toUpperCase()}</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-semibold text-gray-800 truncate">${escHtml(msg.name)}</p>
+              <p class="text-xs text-gray-500 truncate mt-0.5">${escHtml(msg.message)}</p>
+              <p class="text-[10px] text-gray-400 mt-1">${escHtml(msg.created_at || '')}</p>
+            </div>
+          </a>`).join('');
+      }
+    }).catch(() => {});
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  pollNotifications();
+  setInterval(pollNotifications, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* App-specific styles */
+
+/* Perspective for 3D transforms */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom selection color */
+::selection {
+  background: hsl(330 75% 55% / 0.3);
+  color: inherit;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea {
+  transition: all 0.3s ease;
+}
+
+/* Focus styles */
+input:focus, textarea:focus, button:focus {
+  outline: none;
+}
+
+/* Prevent text selection on decorative elements */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Hardware acceleration for animations */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile touch improvements */
+@media (hover: none) {
+  .hover\:scale-105:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Canvas responsive sizing */
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Glass morphism fallback for older browsers */
+@supports not (backdrop-filter: blur(20px)) {
+  .glass,
+  .glass-pink {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}

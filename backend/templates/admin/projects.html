@@ -1,0 +1,250 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-2">Projects</h1>
+    <p class="text-gray-500 flex items-center gap-2">
+      <span class="text-sm font-medium">Showcase your best work to the world.</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-brand-200"></span>
+      <span class="inline-flex items-center gap-1.5 text-xs text-brand-500 font-bold uppercase tracking-widest">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+        </span>
+        Project Manager Live
+      </span>
+    </p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-5 gap-10">
+
+  <!-- Add Project Form (Left Column) -->
+  <div class="lg:col-span-2">
+    <div class="sticky top-24 bg-white/60 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(236,72,153,0.1)]">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-500 shadow-sm">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        </div>
+        <h2 class="text-2xl font-black text-gray-800">New Project</h2>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <div class="space-y-4">
+          <div class="group/field space-y-2">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Project Title <span class="text-brand-500">*</span></label>
+            <input type="text" name="title" required placeholder="e.g. Le Maison Yelo Lane"
+              class="w-full px-5 py-4 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all font-bold shadow-sm"/>
+          </div>
+
+          <div class="group/field space-y-2">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Category <span class="text-brand-500">*</span></label>
+            <select name="category" required class="w-full px-5 py-4 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all font-bold shadow-sm cursor-pointer appearance-none">
+              <option value="">Select category</option>
+              <option value="Web App">Web App</option>
+              <option value="Dashboard">Dashboard</option>
+              <option value="Mobile App">Mobile App</option>
+              <option value="Backend">Backend</option>
+              <option value="E-Commerce">E-Commerce</option>
+            </select>
+          </div>
+
+          <div class="group/field space-y-2">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Description <span class="text-brand-500">*</span></label>
+            <textarea name="description" required rows="3" placeholder="What makes this project special?"
+              class="w-full px-5 py-4 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all font-bold shadow-sm resize-none"></textarea>
+          </div>
+
+          <div class="group/field space-y-2">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Tech Stack <span class="text-gray-400 text-[10px] lowercase italic">(comma separated)</span></label>
+            <input type="text" name="tags" placeholder="React, Three.js, Tailwind"
+              class="w-full px-5 py-4 rounded-2xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-sm transition-all font-bold shadow-sm"/>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="group/field space-y-2">
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Live Demo</label>
+              <input type="url" name="live_url" placeholder="https://..."
+                class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-xs transition-all font-bold shadow-sm"/>
+            </div>
+            <div class="group/field space-y-2">
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-brand-500 transition-colors">Source Code</label>
+              <input type="url" name="github_url" placeholder="https://github.com/..."
+                class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:outline-none focus:ring-4 focus:ring-brand-400/10 focus:border-brand-400 text-xs transition-all font-bold shadow-sm"/>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Visual Showcase</label>
+            <div id="dropZone" class="group relative overflow-hidden bg-brand-50/50 border-2 border-dashed border-brand-200 rounded-[1.5rem] p-8 text-center cursor-pointer hover:bg-brand-50/80 hover:border-brand-400 transition-all duration-300"
+                 onclick="document.getElementById('projectImg').click()">
+              <div id="dropContent">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-brand-400 shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <p class="text-xs font-black text-gray-500 uppercase tracking-widest">Upload Screenshot</p>
+                <p class="text-[10px] text-gray-400 mt-1">Drag & drop or click to browse</p>
+              </div>
+              <div id="previewContainer" class="hidden">
+                <img id="previewImg" src="" alt="Preview" class="max-h-40 mx-auto rounded-xl object-contain shadow-2xl"/>
+                <button type="button" onclick="event.stopPropagation(); resetPreview()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+            </div>
+            <input type="file" name="image" id="projectImg" accept="image/*" class="hidden" onchange="previewProject(this)"/>
+          </div>
+
+          <div class="flex items-center gap-3 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+            <div class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="featured" id="featured" class="sr-only peer">
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+            </div>
+            <label for="featured" class="text-sm font-bold text-gray-700">Feature this project on homepage</label>
+          </div>
+        </div>
+
+        <button type="submit"
+          class="group relative w-full py-5 bg-gradient-to-r from-brand-500 via-brand-600 to-purple-600 text-white text-lg font-black rounded-2xl shadow-xl shadow-brand-200 hover:shadow-brand-300 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-3 overflow-hidden">
+          <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          <span>Initialize Project</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Projects List (Right Column) -->
+  <div class="lg:col-span-3 space-y-6">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-2xl font-black text-gray-900 flex items-center gap-3">
+        Project Library
+        <span class="text-sm font-bold bg-brand-50 text-brand-500 px-3 py-1 rounded-full">{{ projects|length }}</span>
+      </h2>
+      <div class="flex items-center gap-2">
+        <!-- Search could go here -->
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6" id="projectsContainer">
+      {% if projects %}
+        {% for proj in projects %}
+        <div class="project-card group bg-white/60 backdrop-blur-xl rounded-[2rem] border border-white/50 shadow-sm overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-brand-100 hover:-translate-y-1">
+          <div class="flex flex-col sm:flex-row h-full">
+            <!-- Project Image -->
+            <div class="sm:w-56 h-48 sm:h-auto relative overflow-hidden bg-gray-100">
+              {% if proj.image_url %}
+                <img src="{{ proj.image_url }}" alt="{{ proj.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+              {% else %}
+                <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-brand-50 to-purple-50 text-brand-200">
+                  <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  <p class="text-[10px] font-black uppercase tracking-widest mt-2">No Preview Available</p>
+                </div>
+              {% endif %}
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <span class="text-[10px] font-black text-white uppercase tracking-widest">{{ proj.category }}</span>
+              </div>
+            </div>
+
+            <!-- Project Content -->
+            <div class="flex-1 p-6 sm:p-8 flex flex-col">
+              <div class="flex items-start justify-between gap-4 mb-3">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="text-xl font-black text-gray-900 truncate group-hover:text-brand-600 transition-colors">{{ proj.title }}</h3>
+                    {% if proj.featured %}
+                    <span class="w-2 h-2 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(236,72,153,0.5)]"></span>
+                    {% endif %}
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="text-[10px] font-black text-brand-500 bg-brand-50/50 px-2.5 py-1 rounded-lg uppercase tracking-wider">{{ proj.category }}</span>
+                    {% if proj.featured %}
+                    <span class="text-[10px] font-black text-purple-500 bg-purple-50/50 px-2.5 py-1 rounded-lg uppercase tracking-wider">Featured</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <a href="/admin/projects/edit/{{ proj.id }}"
+                     class="w-10 h-10 rounded-2xl bg-gray-50 text-gray-400 hover:bg-brand-50 hover:text-brand-600 transition-all duration-300 flex items-center justify-center shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </a>
+                  <a href="/admin/projects/delete/{{ proj.id }}"
+                     onclick="return confirm('Delete this project?')"
+                     class="w-10 h-10 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 flex items-center justify-center shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">{{ proj.description }}</p>
+              
+              <div class="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                <div class="flex gap-2">
+                  {% if proj.tags %}
+                    {% for tag in proj.tags.split(',') %}
+                    <span class="text-[10px] font-bold text-gray-400 bg-gray-100/50 px-2 py-1 rounded-md">{{ tag.strip() }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                <div class="flex items-center gap-3">
+                  {% if proj.live_url %}
+                  <a href="{{ proj.live_url }}" target="_blank" class="text-gray-400 hover:text-brand-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                  {% endif %}
+                  {% if proj.github_url %}
+                  <a href="{{ proj.github_url }}" target="_blank" class="text-gray-400 hover:text-brand-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="bg-white/40 backdrop-blur-xl rounded-[2.5rem] border border-white/50 p-20 text-center">
+          <div class="w-20 h-20 rounded-full bg-brand-50 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-brand-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <h3 class="text-xl font-black text-gray-800 mb-2">No projects yet</h3>
+          <p class="text-sm text-gray-500 max-w-xs mx-auto">Start building your legacy by adding your first project today.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function previewProject(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('dropContent').classList.add('hidden');
+        document.getElementById('previewContainer').classList.remove('hidden');
+        document.getElementById('previewImg').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function resetPreview() {
+    document.getElementById('projectImg').value = '';
+    document.getElementById('dropContent').classList.remove('hidden');
+    document.getElementById('previewContainer').classList.add('hidden');
+    document.getElementById('previewImg').src = '';
+  }
+</script>
+
+<style>
+  @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .project-card { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  {% for proj in projects %}
+  .project-card:nth-child({{ loop.index }}) { animation-delay: {{ loop.index0 * 0.1 }}s; }
+  {% endfor %}
+</style>
+
+{% endblock %}
